@@ -1,0 +1,100 @@
+header {
+  background-color: var(--color-dark);
+  padding: 0.75rem 1.5rem;
+  position: sticky;
+  top: 0;
+}
+
+header nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  font-size: 0.85rem;
+}
+
+header nav a {
+  color: #f4f4f4;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.3rem 0;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+header nav a:hover {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+.nav-session {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.nav-session-logged {
+  order: 3;
+  margin-left: auto;
+  gap: 0.75rem;
+}
+
+.nav-cart {
+  order: 2;
+}
+
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #f4f4f4;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.nav-user-icon {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  position: relative;
+}
+
+.nav-user-icon::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  background-color: var(--color-accent);
+  border-radius: 50%;
+  position: absolute;
+  left: 5px;
+  top: 1px;
+}
+
+.nav-user-icon::after {
+  content: "";
+  width: 14px;
+  height: 8px;
+  background-color: var(--color-accent);
+  border-radius: 10px 10px 4px 4px;
+  position: absolute;
+  left: 2px;
+  bottom: 1px;
+}
+
+.nav-logout {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #f4f4f4;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.3rem 0;
+}
+
+.nav-logout:hover {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}

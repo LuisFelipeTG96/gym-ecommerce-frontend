@@ -1,0 +1,255 @@
+/* 1ra seccion - Todos los estilos CSS para dispositivos moviles (aplicando Mobile-First) */
+
+:root {
+  --color-bg: #f4f4f4;
+  --color-dark: #1a1a1a;
+  --color-accent: #e63946;
+  --color-accent-hover: #c8283a;
+  --color-card-bg: #ffffff;
+  --color-text: #222222;
+  --color-text-light: #666666;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background-color: var(--color-accent);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-accent-hover);
+}
+
+.btn-secondary {
+  background-color: #e0e0e0;
+  color: var(--color-text);
+}
+
+.btn-secondary:hover {
+  background-color: #cccccc;
+}
+
+.btn-block {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+h1 {
+  color: var(--color-dark);
+  font-size: 1.5rem;
+}
+
+.brand-banner {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  text-align: center;
+  margin: 0 0 0.5rem;
+}
+
+.card {
+  background-color: var(--color-card-bg);
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 400px;
+  margin: 40px auto;
+  text-align: center;
+}
+
+.card img {
+  max-width: 150px;
+  display: block;
+  margin: 0 auto 1rem;
+}
+
+.card-wide {
+  max-width: 480px;
+}
+
+.page-container {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  flex: 1;
+  box-sizing: border-box;
+}
+
+.products-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.form-group {
+  margin-bottom: 0.9rem;
+  text-align: left;
+}
+
+.form-control input,
+.form-control select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.cart-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 1.5rem;
+}
+
+.cart-sticky-bar {
+  position: sticky;
+  bottom: 0;
+  background-color: var(--color-bg);
+  padding: 0.5rem 0;
+}
+
+.checkout-layout {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.checkout-summary {
+  background-color: var(--color-card-bg);
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 1.5rem;
+  align-self: start;
+}
+
+.checkout-summary h2 {
+  color: var(--color-dark);
+  font-size: 1.1rem;
+  margin: 0 0 0.75rem;
+}
+
+.form-message {
+  min-height: 1.2rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.form-message.error {
+  color: var(--color-accent);
+}
+
+.form-message.success {
+  color: #247a36;
+}
+
+.actions {
+  max-width: 400px;
+  margin: 0 auto;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.cart-empty {
+  font-size: 1.5rem;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  text-align: center;
+}
+
+.empty-state .cart-empty {
+  margin-bottom: 1rem;
+}
+
+/* 2da seccion - 1er breakpoint con media queries - Estilos para Tablets */
+@media (min-width: 768px) {
+  .page-container {
+    padding: 32px;
+  }
+
+  header nav {
+    gap: 2rem;
+    font-size: 1rem;
+  }
+
+  h1 {
+    font-size: 1.75rem;
+  }
+
+}
+
+/* 3ra seccion - 2do breakpoint con media queries - Estilos para Desktop o pantallas mas grandes */
+@media (min-width: 1024px) {
+  .page-container {
+    padding: 40px;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  .card-wide {
+    max-width: 550px;
+  }
+
+  .checkout-layout {
+    grid-template-columns: 70% 30%;
+  }
+
+  .checkout-summary {
+    order: 2;
+  }
+
+  header nav {
+    font-size: 1.05rem;
+  }
+
+  .checkout-form-row {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 1.5rem;
+  }
+
+}
