@@ -17,7 +17,7 @@ function Header() {
                     <div className="nav-session nav-session-logged">
                         <span className="nav-user">
                             <span className="nav-user-icon"></span>
-                            <span>{usuarioLogueado.nombres}</span>
+                            <span>{usuarioLogueado.nombre}</span>
                         </span>
                         <button onClick={cerrarSesion} className="nav-logout">Cerrar Sesión</button>
                     </div>

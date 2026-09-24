@@ -24,7 +24,7 @@ function ProductCard({ product, onAgregar }) {
                     />
                 </div>
             </div>
-            <button onClick={() => onAgregar(product.id, cantidad)} className="btn btn-primary">Agregar al Carrito</button>
+            <button onClick={() => onAgregar(product, cantidad)} className="btn btn-primary">Agregar al Carrito</button>
         </article>
     );
 }

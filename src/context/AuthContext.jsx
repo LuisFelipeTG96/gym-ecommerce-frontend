@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect, useContext } from 'react';
+import { apiFetch } from '../services/api';
 
 const AuthContext = createContext();
 
@@ -16,15 +17,7 @@ export function AuthProvider({ children }) {
         }
     }, [usuarioLogueado]);
 
-    const obtenerUsuarios = () => {
-        return JSON.parse(localStorage.getItem('usuarios')) || [];
-    };
-
-    const guardarUsuarios = (usuarios) => {
-        localStorage.setItem('usuarios', JSON.stringify(usuarios));
-    };
-
-    const iniciarSesion = (correoInput, passwordInput) => {
+    const iniciarSesion = async (correoInput, passwordInput) => {
 
         const correo = correoInput.trim().toLowerCase();
         const password = passwordInput.trim();
@@ -33,35 +26,39 @@ export function AuthProvider({ children }) {
             return { ok: false, error: 'Debe ingresar correo y contraseña' };
         }
 
-        const usuarios = obtenerUsuarios();
-        const usuarioEncontrado = usuarios.find(
-            (usuario) => usuario.correo === correo && usuario.password === password
-        );
+        try {
+            const data = await apiFetch('/seguridad/login', {
+                method: 'POST',
+                body: JSON.stringify({ email: correo, password }),
+            });
 
-        if (usuarioEncontrado === undefined) {
-            return { ok: false, error: 'El usuario o la contraseña no son correctos' };
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('refreshToken', data.refreshToken);
+
+            let perfil = data.user;
+            try {
+                perfil = await apiFetch('/seguridad/perfil');
+            } catch {
+                // si falla, seguimos con los datos basicos que ya trajo el login
+            }
+
+            setUsuarioLogueado(perfil);
+            window.location.href = '/';
+            return { ok: true };
+        } catch (error) {
+            return { ok: false, error: error.data?.error || 'El usuario o la contraseña no son correctos' };
         }
-
-        setUsuarioLogueado({ nombres: usuarioEncontrado.nombres, correo: usuarioEncontrado.correo });
-        window.location.href = '/';
-        return { ok: true };
     };
 
-    const crearCuenta = (datos) => {
+    const crearCuenta = async (datos) => {
 
-        const { nombres, apellidos, celular, fechaNacimiento, documento, correo, password, passwordConfirmation } = datos;
+        const { nombres, apellidos, documento, idTipoDocumento, correo, password, passwordConfirmation } = datos;
 
-        if (!nombres || !apellidos || !celular || !fechaNacimiento || !documento || !correo || !password || !passwordConfirmation) {
+        if (!nombres || !apellidos || !documento || !correo || !password || !passwordConfirmation) {
             return { ok: false, error: 'Todos los campos son obligatorios' };
         }
         if (!correo.includes('@') || !correo.includes('.')) {
             return { ok: false, error: 'Debe ingresar un correo electrónico válido' };
-        }
-        if (isNaN(Number(celular)) || celular.length < 9) {
-            return { ok: false, error: 'El celular debe tener al menos 9 dígitos numéricos' };
-        }
-        if (isNaN(Number(documento)) || documento.length < 8) {
-            return { ok: false, error: 'El documento debe tener al menos 8 dígitos numéricos' };
         }
         if (password.length < 6) {
             return { ok: false, error: 'La contraseña debe tener al menos 6 caracteres' };
@@ -70,21 +67,27 @@ export function AuthProvider({ children }) {
             return { ok: false, error: 'Las contraseñas no coinciden' };
         }
 
-        const usuarios = obtenerUsuarios();
-        const correoNormalizado = correo.trim().toLowerCase();
-        const usuarioExiste = usuarios.find((usuario) => usuario.correo === correoNormalizado);
-
-        if (usuarioExiste !== undefined) {
-            return { ok: false, error: 'Ya existe una cuenta con ese correo electrónico' };
+        try {
+            await apiFetch('/seguridad/registro', {
+                method: 'POST',
+                body: JSON.stringify({
+                    nombre: nombres,
+                    apellido: apellidos,
+                    nro_documento: documento,
+                    id_tipodocumento: idTipoDocumento,
+                    email: correo.trim().toLowerCase(),
+                    password,
+                }),
+            });
+            return { ok: true };
+        } catch (error) {
+            return { ok: false, error: error.data?.error || 'No se pudo crear la cuenta' };
         }
-
-        usuarios.push({ nombres, apellidos, celular, fechaNacimiento, documento, correo: correoNormalizado, password });
-        guardarUsuarios(usuarios);
-
-        return { ok: true };
     };
 
     const cerrarSesion = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
         setUsuarioLogueado(null);
     };
 

@@ -8,6 +8,7 @@ function CrearCuenta() {
     const [apellidos, setApellidos] = useState('');
     const [celular, setCelular] = useState('');
     const [fechaNacimiento, setFechaNacimiento] = useState('');
+    const [idTipoDocumento, setIdTipoDocumento] = useState(1);
     const [documento, setDocumento] = useState('');
     const [correo, setCorreo] = useState('');
     const [password, setPassword] = useState('');
@@ -16,12 +17,12 @@ function CrearCuenta() {
 
     const { crearCuenta } = useAuth();
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
 
         event.preventDefault();
 
-        const resultado = crearCuenta({
-            nombres, apellidos, celular, fechaNacimiento, documento, correo, password, passwordConfirmation
+        const resultado = await crearCuenta({
+            nombres, apellidos, celular, fechaNacimiento, documento, idTipoDocumento, correo, password, passwordConfirmation
         });
 
         if (!resultado.ok) {
@@ -78,14 +79,28 @@ function CrearCuenta() {
                         onChange={(e) => setFechaNacimiento(e.target.value)}
                         required
                     />
+                    <div className="form-group">
+                        <label htmlFor="tipo_documento">Tipo de documento</label>
+                        <div className="form-control">
+                            <select
+                                id="tipo_documento"
+                                value={idTipoDocumento}
+                                onChange={(e) => setIdTipoDocumento(Number(e.target.value))}
+                                required
+                            >
+                                <option value={1}>DNI</option>
+                                <option value={2}>Pasaporte</option>
+                                <option value={3}>Carnet de Extranjería</option>
+                            </select>
+                        </div>
+                    </div>
                     <FormField
                         id="documento"
-                        label="DNI/Carnet de Extranjería"
-                        inputMode="numeric"
-                        pattern="[0-9]{8,12}"
+                        label="Número de documento"
+                        pattern="[A-Za-z0-9]{8,12}"
                         minLength={8}
                         maxLength={12}
-                        title="El DNI/Carnet de Extranjería solo debe contener 8-12 números"
+                        title="El número de documento debe tener entre 8 y 12 caracteres alfanuméricos"
                         value={documento}
                         onChange={(e) => setDocumento(e.target.value)}
                         required

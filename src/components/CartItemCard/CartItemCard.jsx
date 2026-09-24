@@ -1,17 +1,15 @@
-import { dataProductos } from '../../data/products';
 import './CartItemCard.css'
 
 function CartItemCard({ item, onEliminar, onCantidadChange }) {
 
-    const producto = dataProductos.find((p) => p.id === item.id);
     const subtotal = item.price * item.cantidad;
 
     return (
         <article className="product-card">
             <img src={item.image} alt={item.name} className="product-card-img" />
             <h3 className="product-card-name">{item.name}</h3>
-            <p className="product-card-info">{producto.description}</p>
-            <p className="product-card-tags">{producto.gender} - {producto.ageGroup} - Talla: {producto.size}</p>
+            <p className="product-card-info">{item.description}</p>
+            <p className="product-card-tags">{item.gender} - {item.ageGroup} - Talla: {item.size}</p>
             <div className="product-card-price-row">
                 <p className="product-card-info">S/. {item.price.toFixed(2)}</p>
                 <div className="product-card-qty">

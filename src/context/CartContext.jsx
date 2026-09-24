@@ -1,47 +1,118 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { dataProductos } from '../data/products';
-
+import { apiFetch, apiFetchWithCsrf } from '../services/api';
+import { useAuth } from './AuthContext';
 
 const CartContext = createContext();
 
+function mapCarritoDetalle(detalle) {
+    const producto = detalle.producto || {};
+    return {
+        id: detalle.id_carrito_detalle,
+        idProducto: detalle.id_producto,
+        name: producto.nombre,
+        price: producto.precio,
+        image: producto.imagen_url,
+        description: producto.descripcion,
+        gender: producto.genero === 'hombre' ? 'Hombre' : producto.genero === 'mujer' ? 'Mujer' : 'Unisex',
+        ageGroup: producto.grupo_edad === 'nino' ? 'Niño' : 'Adulto',
+        size: producto.talla,
+        cantidad: detalle.cantidad,
+    };
+}
+
 export function CartProvider({ children }) {
+
+    const { usuarioLogueado } = useAuth();
 
     const [carrito, setCarrito] = useState(() => {
         return JSON.parse(localStorage.getItem('carrito')) || [];
     });
 
     useEffect(() => {
-        localStorage.setItem('carrito', JSON.stringify(carrito));
-    }, [carrito]);
+        if (!usuarioLogueado) {
+            localStorage.setItem('carrito', JSON.stringify(carrito));
+        }
+    }, [carrito, usuarioLogueado]);
 
-    const agregarAlCarrito = (id, cantidad = 1) => {
+    const cargarCarritoBackend = async () => {
+        try {
+            const data = await apiFetch('/carrito');
+            const detalles = data?.carritoDetalles || [];
+            setCarrito(detalles.map(mapCarritoDetalle));
+        } catch {
+            setCarrito([]);
+        }
+    };
+
+    useEffect(() => {
+        if (usuarioLogueado) {
+            cargarCarritoBackend();
+        } else {
+            setCarrito(JSON.parse(localStorage.getItem('carrito')) || []);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [usuarioLogueado]);
+
+    const agregarAlCarrito = async (producto, cantidad = 1) => {
 
         if (isNaN(cantidad) || cantidad < 1) cantidad = 1;
 
+        if (usuarioLogueado) {
+            await apiFetchWithCsrf('/carrito', {
+                method: 'POST',
+                body: JSON.stringify({ id_producto: producto.id, cantidad }),
+            });
+            await cargarCarritoBackend();
+            return;
+        }
+
         setCarrito((prevCarrito) => {
-            const exists = prevCarrito.find((x) => x.id === id);
+            const exists = prevCarrito.find((x) => x.id === producto.id);
             if (exists) {
-                return prevCarrito.map((x) => {
-                    return x.id === id ? { ...x, cantidad: x.cantidad + cantidad} : x
-                });
+                return prevCarrito.map((x) => (
+                    x.id === producto.id ? { ...x, cantidad: x.cantidad + cantidad } : x
+                ));
             }
 
-            const producto = dataProductos.find((x) => x.id === id);
-            return [...prevCarrito, { id: producto.id, name: producto.name, price: producto.price, image: producto.image, cantidad: cantidad }];
+            return [...prevCarrito, {
+                id: producto.id,
+                name: producto.name,
+                price: producto.price,
+                image: producto.image,
+                description: producto.description,
+                gender: producto.gender,
+                ageGroup: producto.ageGroup,
+                size: producto.size,
+                cantidad,
+            }];
         });
     };
 
-    const eliminarProductoCarrito = (id) => {
+    const eliminarProductoCarrito = async (id) => {
+        if (usuarioLogueado) {
+            await apiFetchWithCsrf(`/carrito/${id}`, { method: 'DELETE' });
+            await cargarCarritoBackend();
+            return;
+        }
         setCarrito((prevCarrito) => prevCarrito.filter((x) => x.id !== id));
     };
 
-    const actualizarCantidad = (id, nuevaCantidad) => {
+    const actualizarCantidad = async (id, nuevaCantidad) => {
 
         if (isNaN(nuevaCantidad) || nuevaCantidad < 1) nuevaCantidad = 1;
 
-        setCarrito((prevCarrito) => {
-            return prevCarrito.map((x) => (x.id === id ? { ...x, cantidad: nuevaCantidad } : x))
-        });
+        if (usuarioLogueado) {
+            await apiFetchWithCsrf(`/carrito/${id}`, {
+                method: 'PUT',
+                body: JSON.stringify({ cantidad: nuevaCantidad }),
+            });
+            await cargarCarritoBackend();
+            return;
+        }
+
+        setCarrito((prevCarrito) => (
+            prevCarrito.map((x) => (x.id === id ? { ...x, cantidad: nuevaCantidad } : x))
+        ));
     };
 
     const vaciarCarrito = () => setCarrito([]);

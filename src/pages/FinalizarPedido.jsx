@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import { apiFetchWithCsrf } from '../services/api';
 import CartSummaryItem from '../components/CartSummaryItem/CartSummaryItem';
 import FormSection from '../components/FormSection/FormSection';
 import FormField from '../components/FormField/FormField';
@@ -7,6 +9,7 @@ import FormField from '../components/FormField/FormField';
 function FinalizarPedido() {
 
     const { carrito, precioTotalCarrito, vaciarCarrito } = useCart();
+    const { usuarioLogueado } = useAuth();
 
     const [nombres, setNombres] = useState('');
     const [apellidos, setApellidos] = useState('');
@@ -20,7 +23,7 @@ function FinalizarPedido() {
     const [fechaExpiracion, setFechaExpiracion] = useState('');
     const [cvv, setCvv] = useState('');
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
 
         event.preventDefault();
 
@@ -28,9 +31,25 @@ function FinalizarPedido() {
             alert('No hay productos en tu carrito');
             return;
         }
-        alert('Pedido finalizado correctamente');
-        vaciarCarrito();
-        window.location.href = '/';
+
+        if (!usuarioLogueado) {
+            alert('Debes iniciar sesión para finalizar tu pedido');
+            window.location.href = '/iniciarSesion';
+            return;
+        }
+
+        try {
+            const direccion_envio = `${direccion}, ${distrito}${referencia ? ' - ' + referencia : ''}`;
+            await apiFetchWithCsrf('/pedidos', {
+                method: 'POST',
+                body: JSON.stringify({ direccion_envio, metodo_pago: 'tarjeta' }),
+            });
+            alert('Pedido finalizado correctamente');
+            vaciarCarrito();
+            window.location.href = '/';
+        } catch (error) {
+            alert(error.data?.error || 'No se pudo finalizar el pedido');
+        }
     };
 
     return (

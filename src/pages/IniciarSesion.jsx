@@ -11,10 +11,10 @@ function IniciarSesion() {
 
     const { iniciarSesion } = useAuth();
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
 
         event.preventDefault();
-        const resultado = iniciarSesion(correo, password);
+        const resultado = await iniciarSesion(correo, password);
 
         if (!resultado.ok) {
             setMensaje({ texto: resultado.error, tipo: 'error' });
