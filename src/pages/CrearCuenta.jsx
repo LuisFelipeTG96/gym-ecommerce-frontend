@@ -2,6 +2,12 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import FormField from '../components/FormField/FormField'
 
+const VALIDACION_DOCUMENTO = {
+    1: { pattern: '[0-9]{8}', minLength: 8, maxLength: 8, title: 'El DNI debe tener exactamente 8 números' },
+    2: { pattern: '[A-Za-z0-9]{9,15}', minLength: 9, maxLength: 15, title: 'El pasaporte debe tener entre 9 y 15 caracteres alfanuméricos' },
+    3: { pattern: '[A-Za-z0-9]{9,12}', minLength: 9, maxLength: 12, title: 'El carnet de extranjería debe tener entre 9 y 12 caracteres alfanuméricos' },
+};
+
 function CrearCuenta() {
 
     const [nombres, setNombres] = useState('');
@@ -16,6 +22,8 @@ function CrearCuenta() {
     const [mensaje, setMensaje] = useState({ texto: '', tipo: '' });
 
     const { crearCuenta } = useAuth();
+
+    const validacionDocumento = VALIDACION_DOCUMENTO[idTipoDocumento];
 
     const handleSubmit = async (event) => {
 
@@ -85,7 +93,10 @@ function CrearCuenta() {
                             <select
                                 id="tipo_documento"
                                 value={idTipoDocumento}
-                                onChange={(e) => setIdTipoDocumento(Number(e.target.value))}
+                                onChange={(e) => {
+                                    setIdTipoDocumento(Number(e.target.value));
+                                    setDocumento('');
+                                }}
                                 required
                             >
                                 <option value={1}>DNI</option>
@@ -97,10 +108,10 @@ function CrearCuenta() {
                     <FormField
                         id="documento"
                         label="Número de documento"
-                        pattern="[A-Za-z0-9]{8,12}"
-                        minLength={8}
-                        maxLength={12}
-                        title="El número de documento debe tener entre 8 y 12 caracteres alfanuméricos"
+                        pattern={validacionDocumento.pattern}
+                        minLength={validacionDocumento.minLength}
+                        maxLength={validacionDocumento.maxLength}
+                        title={validacionDocumento.title}
                         value={documento}
                         onChange={(e) => setDocumento(e.target.value)}
                         required
