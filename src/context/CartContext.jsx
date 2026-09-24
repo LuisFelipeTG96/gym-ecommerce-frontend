@@ -45,13 +45,21 @@ export function CartProvider({ children }) {
     };
 
     const migrarCarritoLocal = async () => {
+        console.log('[DEBUG] migrarCarritoLocal called');
         const carritoLocal = JSON.parse(localStorage.getItem('carrito')) || [];
+        console.log('[DEBUG] carritoLocal', carritoLocal);
 
-        for (const item of carritoLocal) {
-            await apiFetchWithCsrf('/carrito', {
-                method: 'POST',
-                body: JSON.stringify({ id_producto: item.id, cantidad: item.cantidad }),
-            });
+        try {
+            for (const item of carritoLocal) {
+                console.log('[DEBUG] posting item', item);
+                const result = await apiFetchWithCsrf('/carrito', {
+                    method: 'POST',
+                    body: JSON.stringify({ id_producto: item.id, cantidad: item.cantidad }),
+                });
+                console.log('[DEBUG] post result', result);
+            }
+        } catch (err) {
+            console.log('[DEBUG] migration error', err, err?.status, err?.data);
         }
 
         if (carritoLocal.length > 0) {
