@@ -44,13 +44,29 @@ export function CartProvider({ children }) {
         }
     };
 
+    const migrarCarritoLocal = async () => {
+        const carritoLocal = JSON.parse(localStorage.getItem('carrito')) || [];
+
+        for (const item of carritoLocal) {
+            await apiFetchWithCsrf('/carrito', {
+                method: 'POST',
+                body: JSON.stringify({ id_producto: item.id, cantidad: item.cantidad }),
+            });
+        }
+
+        if (carritoLocal.length > 0) {
+            localStorage.removeItem('carrito');
+        }
+
+        await cargarCarritoBackend();
+    };
+
     useEffect(() => {
         if (usuarioLogueado) {
-            cargarCarritoBackend();
+            migrarCarritoLocal();
         } else {
             setCarrito(JSON.parse(localStorage.getItem('carrito')) || []);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [usuarioLogueado]);
 
     const agregarAlCarrito = async (producto, cantidad = 1) => {
